@@ -7,17 +7,24 @@ ARG MAVEN_VERSION=3.5.4
 ARG USER_HOME_DIR="/root"
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
-RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
-  && wget ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
-  && tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /usr/share/maven --strip-components=1 \
-  && rm -f apache-maven-${MAVEN_VERSION}-bin.tar.gz \
-  && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+RUN mkdir -p /usr/share/maven /usr/share/maven/ref && \
+  apt-get update && \
+  apt-get install -y --no-install-recommends wget && \
+  wget ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
+  tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /usr/share/maven --strip-components=1 && \
+  rm -f apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
+  apt-get purge -y wget libpsl5 && \
+  apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/{apt,dpkg,cache,log} && \
+  ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
 COPY files/mvn-entrypoint.sh /usr/local/bin/mvn-entrypoint.sh
-COPY files/settings-docker.xml /usr/share/maven/ref/
+COPY files/settings-docker.xml $MAVEN_CONFIG/settings.xml
+COPY files/pom.xml $USER_HOME_DIR
+
+RUN cd $USER_HOME_DIR && mvn verify
 
 ENTRYPOINT ["/usr/local/bin/mvn-entrypoint.sh"]
 CMD ["mvn"]
