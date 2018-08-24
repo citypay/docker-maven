@@ -9,11 +9,10 @@ ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref && \
   apt-get update && \
-  apt-get install -y --no-install-recommends wget && \
+  apt-get install -y --no-install-recommends wget libxml2-utils && \
   wget ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
   tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /usr/share/maven --strip-components=1 && \
   rm -f apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
-  apt-get purge -y wget libpsl5 && \
   apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/{apt,dpkg,cache,log} && \
   ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
