@@ -8,8 +8,8 @@ ARG USER_HOME_DIR="/root"
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref && \
-  apt-get update && \
-  apt-get install -y --no-install-recommends wget libxml2-utils && \
+  sh -c apt-get update -qq >/dev/null && \
+  apt-get install -y --no-install-recommends wget libxml2-utils html2text && \
   wget ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
   tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /usr/share/maven --strip-components=1 && \
   rm -f apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
@@ -19,11 +19,11 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref && \
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
-COPY files/mvn-entrypoint.sh /usr/local/bin/mvn-entrypoint.sh
+COPY files/*.sh /usr/local/bin/
 COPY files/settings-docker.xml $MAVEN_CONFIG/settings.xml
 COPY files/pom.xml $USER_HOME_DIR
 
-RUN cd $USER_HOME_DIR && mvn verify
+#RUN cd $USER_HOME_DIR && mvn verify
 
 ENTRYPOINT ["/usr/local/bin/mvn-entrypoint.sh"]
 CMD ["mvn"]
