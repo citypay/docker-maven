@@ -8,7 +8,7 @@ ARG USER_HOME_DIR="/root"
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref && \
-  sh -c apt-get update -qq >/dev/null && \
+  apt-get update -qq && \
   apt-get install -y --no-install-recommends wget libxml2-utils html2text && \
   wget ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
   tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /usr/share/maven --strip-components=1 && \
