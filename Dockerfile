@@ -4,8 +4,8 @@ LABEL maintainer="Gary Feltham <gary.feltham@citypay.com>"
 # COPY files/webupd8team_ubuntu_java.gpg /etc/apt/trusted.gpg.d/
 COPY files/*.jar /tmp/
 
-ENV JAVA_VERSION=8u171
-ENV JAVA_UBUNTU_VERSION=8u171-b11-2
+ENV JAVA_VERSION=8u181
+ENV JAVA_UBUNTU_VERSION=8u181-b13-1ubuntu0.18.04.1
 
 ENV LANG C.UTF-8
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
