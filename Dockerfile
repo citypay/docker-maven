@@ -5,7 +5,6 @@ LABEL maintainer="Gary Feltham <gary.feltham@citypay.com>"
 COPY files/*.jar /tmp/
 
 ENV JAVA_VERSION=8u181
-ENV JAVA_UBUNTU_VERSION=8u181-b13-1ubuntu0.18.04.1
 
 ENV LANG C.UTF-8
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
@@ -19,13 +18,19 @@ ARG USER_HOME_DIR="/root"
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 
-#RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu bionic main" > /etc/apt/sources.list.d/webupd8team-ubuntu-java-bionic.list && \
-#    echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections && \
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        tzdata locales && \
+    echo "Etc/UTC" | tee /etc/timezone && \
+    ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    echo en_US.UTF-8 UTF-8 >> /etc/locale.gen && \
+        locale-gen && \
+        update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
+    apt-get install -y --no-install-recommends \
         ca-certificates-java \
-        openjdk-8-jdk-headless=$JAVA_UBUNTU_VERSION && \
+        openjdk-8-jdk-headless awscli && \
     echo $JAVA_HOME && \
     mv /tmp/local_policy.jar ${JAVA_HOME}/jre/lib/security/ && \
     mv /tmp/US_export_policy.jar ${JAVA_HOME}/jre/lib/security/ && \
@@ -68,6 +73,16 @@ RUN apt-get update && \
            rm -f apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
            apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/{apt,dpkg,cache,log} && \
            ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+
+# Set the locale for UTF-8 support
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+
+# AWS CLI needs the PYTHONIOENCODING environment varialbe to handle UTF-8 correctly:
+ENV PYTHONIOENCODING=UTF-8
 
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
