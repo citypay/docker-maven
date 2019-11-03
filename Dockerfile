@@ -67,7 +67,7 @@ RUN apt-get update && \
            ./jre/lib/plugin.jar && java -version && \
            mkdir -p /usr/share/maven /usr/share/maven/ref && \
            apt-get update -qq && \
-           apt-get install -y --no-install-recommends wget libxml2-utils html2text unzip && \
+           apt-get install -y --no-install-recommends wget libxml2-utils html2text unzip rsync && \
            wget ${BASE_URL}/apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
            tar -xzf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /usr/share/maven --strip-components=1 && \
            rm -f apache-maven-${MAVEN_VERSION}-bin.tar.gz && \
