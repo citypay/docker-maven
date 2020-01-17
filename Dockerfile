@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:16.04
 LABEL maintainer="Gary Feltham <gary.feltham@citypay.com>"
 
 # COPY files/webupd8team_ubuntu_java.gpg /etc/apt/trusted.gpg.d/
@@ -92,7 +92,7 @@ COPY files/microscanner /usr/local/bin/
 COPY files/settings-docker.xml $MAVEN_CONFIG/settings.xml
 COPY files/pom.xml $USER_HOME_DIR
 
-#RUN cd $USER_HOME_DIR && mvn verify
+RUN cd $USER_HOME_DIR && mvn verify dependency:copy-dependencies
 
 ENTRYPOINT ["/usr/local/bin/mvn-entrypoint.sh"]
 CMD ["mvn"]
