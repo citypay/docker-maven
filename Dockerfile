@@ -1,10 +1,8 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 LABEL maintainer="Gary Feltham <gary.feltham@citypay.com>"
 
 # COPY files/webupd8team_ubuntu_java.gpg /etc/apt/trusted.gpg.d/
 COPY files/*.jar /tmp/
-
-ENV JAVA_VERSION=8u181
 
 ENV LANG C.UTF-8
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
@@ -21,7 +19,7 @@ ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        tzdata locales && \
+        tzdata locales curl && \
     echo "Etc/UTC" | tee /etc/timezone && \
     ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
