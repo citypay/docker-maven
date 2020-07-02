@@ -28,7 +28,7 @@ RUN apt-get update && \
         update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
     apt-get install -y --no-install-recommends \
         ca-certificates-java \
-        openjdk-8-jdk-headless awscli && \
+        openjdk-8-jdk-headless && \
     echo $JAVA_HOME && \
     mv /tmp/local_policy.jar ${JAVA_HOME}/jre/lib/security/ && \
     mv /tmp/US_export_policy.jar ${JAVA_HOME}/jre/lib/security/ && \
@@ -72,25 +72,28 @@ RUN apt-get update && \
            apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/{apt,dpkg,cache,log} && \
            ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
 
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && ./aws/install
 
 # Set the locale for UTF-8 support
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-
 # AWS CLI needs the PYTHONIOENCODING environment varialbe to handle UTF-8 correctly:
 ENV PYTHONIOENCODING=UTF-8
 
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
+COPY files/pom.xml $USER_HOME_DIR
+RUN cd $USER_HOME_DIR && mvn verify dependency:copy-dependencies
 
 COPY files/*.sh /usr/local/bin/
 COPY files/microscanner /usr/local/bin/
-COPY files/settings-docker.xml $MAVEN_CONFIG/settings.xml
-COPY files/pom.xml $USER_HOME_DIR
 
-RUN cd $USER_HOME_DIR && mvn verify dependency:copy-dependencies
+
+# add the customised settings after the fact, codeartifact should be logged in on entrypoint
+COPY files/settings-docker.xml $MAVEN_CONFIG/settings.xml
 
 ENTRYPOINT ["/usr/local/bin/mvn-entrypoint.sh"]
 CMD ["mvn"]

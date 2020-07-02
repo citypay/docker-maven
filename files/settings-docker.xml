@@ -2,37 +2,40 @@
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-    <localRepository>${user.home}/.m2/repository</localRepository>
-    <interactiveMode>false</interactiveMode>
     <offline>false</offline>
-
+    <pluginGroups></pluginGroups>
+    <proxies></proxies>
+    <mirrors>
+        <mirror>
+            <id>repo</id>
+            <name>${CODEARTIFACT_NAME}</name>
+            <url>${CODEARTIFACT_URL}</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
     <profiles>
         <profile>
-            <id>default</id>
+            <id>main</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
                 <jdk>1.8</jdk>
             </activation>
             <repositories>
                 <repository>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <id>central</id>
-                    <name>Maven Repository Switchboard</name>
-                    <url>http://repo1.maven.org/maven2</url>
-                </repository>
-                <repository>
-                    <snapshots>
-                        <enabled>false</enabled>
-                    </snapshots>
-                    <id>oss.sonatype.org</id>
-                    <name>releases</name>
-                    <url>http://oss.sonatype.org/content/repositories/releases</url>
+                    <id>repo</id>
+                    <url>${CODEARTIFACT_URL}</url>
                 </repository>
             </repositories>
         </profile>
     </profiles>
+
+    <servers>
+        <server>
+            <id>repo</id>
+            <username>aws</username>
+            <password>${CODEARTIFACT_AUTH_TOKEN}</password>
+        </server>
+    </servers>
 
 </settings>
 
