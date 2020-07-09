@@ -32,13 +32,14 @@ copy_reference_files() {
   fi
 }
 
+echo "Obtaining CODEARTIFACT_AUTH_TOKEN"
+export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --region $AWS_DEFAULT_REGION --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_OWNER --query authorizationToken --output text`
+echo $CODEARTIFACT_AUTH_TOKEN | cut -c-32
+echo ""
 export -f copy_reference_file
-export AWS_ACCESS_KEY_ID=$AWS_USER
-export AWS_SECRET_ACCESS_KEY=$AWS_SECRET
-export AWS_PAGER=""
-export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --region $AWS_REGION --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_OWNER --query authorizationToken --output text`
 
+echo "copying reference files"
 copy_reference_files
 unset MAVEN_CONFIG
 
-exec "$@"
+#exec "$@"

@@ -5,9 +5,11 @@
     <offline>false</offline>
     <pluginGroups></pluginGroups>
     <proxies></proxies>
+
+    <!-- setting to central fools maven in the prepared docker image that it has already downloaded -->
     <mirrors>
         <mirror>
-            <id>repo</id>
+            <id>central</id>
             <name>${CODEARTIFACT_NAME}</name>
             <url>${CODEARTIFACT_URL}</url>
             <mirrorOf>*</mirrorOf>
@@ -22,8 +24,14 @@
             </activation>
             <repositories>
                 <repository>
-                    <id>repo</id>
+                    <id>central</id>
                     <url>${CODEARTIFACT_URL}</url>
+                    <releases>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <updatePolicy>daily</updatePolicy>
+                    </snapshots>
                 </repository>
             </repositories>
         </profile>
@@ -31,7 +39,7 @@
 
     <servers>
         <server>
-            <id>repo</id>
+            <id>central</id>
             <username>aws</username>
             <password>${CODEARTIFACT_AUTH_TOKEN}</password>
         </server>
