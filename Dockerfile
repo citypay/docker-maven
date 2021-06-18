@@ -14,14 +14,16 @@ ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ARG MAVEN_VERSION=3.6.3
 ARG USER_HOME_DIR="/root"
 ARG BASE_URL=https://apache.osuosl.org/maven/maven-3/${MAVEN_VERSION}/binaries
+ARG DEBIAN_FRONTEND=noninteractive
 
-
+ENV TZ=Etc/UTC
 
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        tzdata locales curl && \
-    echo "Etc/UTC" | tee /etc/timezone && \
-    ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime && \
+        tzdata locales curl git apt-utils && \
+    echo $TZ > /etc/timezone && \
+    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata && \
     echo en_US.UTF-8 UTF-8 >> /etc/locale.gen && \
         locale-gen && \
@@ -99,6 +101,20 @@ RUN chmod +x /usr/bin/mvn
 # add the customised settings after the fact, codeartifact should be logged in on entrypoint
 COPY files/settings-docker.xml $MAVEN_CONFIG/settings.xml
 COPY files/cis/*.sh /usr/local/bin/
+COPY files/cis/tests/*.sh /usr/local/bin/tests/
+
+# addition of github CLI
+RUN wget https://github.com/cli/cli/releases/download/v0.11.1/gh_0.11.1_linux_amd64.deb && \
+    apt-get install ./gh_*_linux_amd64.deb
+
+# addition of nodejs
+RUN curl -sL https://deb.nodesource.com/setup_10.x -o nodesource_setup.sh && \
+    bash nodesource_setup.sh && \
+    apt-get install -y --no-install-recommends nodejs && \
+    nodejs -v && \
+    npm -v && \
+    npm install requirejs uglify-js -g && \
+    apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/{apt,dpkg,cache,log}
 
 ENTRYPOINT ["/usr/local/bin/mvn-entrypoint.sh"]
 CMD ["mvn"]
